@@ -7,7 +7,6 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 plt.style.use("seaborn")
-
 puzzlereader = []
 
 with open('puzzle.csv', mode='r') as file:
@@ -101,6 +100,8 @@ def FillInNumber(puzzle):
 puzzlepercent = PercentPuzzle(SanitizePuzzle(puzzle))
 FillInNumber(puzzlepercent)
 for i in range(len(puzzlepercent)):
+    plt.gca().set_aspect('equal')
     plt.figure(i+1)
-    sns.heatmap(data=puzzlepercent[i],vmax = 0.5,vmin=-0.1,annot=True)
+    sns.heatmap(data=puzzlepercent[i],vmax = 0.5,vmin=-0.1,annot=True,cbar=False)
+    plt.gca().set_aspect('equal')
 plt.show()
