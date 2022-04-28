@@ -18,8 +18,7 @@ with open('puzzle.csv', mode='r') as file:
 puzzle = np.array(puzzlereader, dtype='float')
 plt.figure(0)
 sns.heatmap(data=puzzle,vmax = 0.5,vmin=-0.1,annot=True)
-
-def SanitizePuzzle(puzzle):
+def InitPuzzle(puzzle):
     newpuzzle = np.array(puzzle)
     numseparatedpuzzle = []
     for index in range(9):
@@ -30,7 +29,15 @@ def SanitizePuzzle(puzzle):
         numseparatedpuzzle.append(newpuzzle)
         newpuzzle = np.array(puzzle)
     numseparatedpuzzle = np.array(numseparatedpuzzle)
-    cleanseparatepuzzle = np.array(numseparatedpuzzle)
+    return numseparatedpuzzle
+
+def SanitizePuzzle(puzzle):
+    cleanseparatepuzzle = np.array(puzzle)
+    for p, cpuzzle in enumerate(cleanseparatepuzzle):
+        for x,line in enumerate(cpuzzle):
+            for y,num in enumerate(line):
+                if num > 0 and num < 1:
+                    cpuzzle[x,y] = 0
     for p,cpuzzle in enumerate(cleanseparatepuzzle):
         for x,line in enumerate(cpuzzle):
             if p+1 in cpuzzle[:,x]:
@@ -55,15 +62,11 @@ def PercentPuzzle(puzzle):
         for x,line in enumerate(ppuzzle):
             if np.any(ppuzzle[:,x] < 1)  and np.any(ppuzzle[:,x] >= 0):
                 count = (1/np.count_nonzero(ppuzzle[:,x] >= 0))/3
-                if count >= 1/2:
-                            print("col count: " + str(count)) 
                 for index,num in enumerate(ppuzzle[:,x]):
                     if num >= 0 and num < 1:
                         ppuzzle[index,x] += count
             if np.any(ppuzzle[x,:] < 1)  and np.any(ppuzzle[x,:] >= 0):
                 count = (1/np.count_nonzero(ppuzzle[x,:] >= 0))/3
-                if count >= 1/2:
-                            print("row count: " + str(count)) 
                 for index,num in enumerate(ppuzzle[x,:]):
                     if num >= 0 and num < 1:
                         ppuzzle[x,index] += count
@@ -91,16 +94,30 @@ def FillInNumber(puzzle):
     numlist = np.array(numlist,dtype=numlisttype)   
     orderednumlist = np.sort(numlist, order='percentage')
     FilledInPuzzle = puzzle
-    print(FilledInPuzzle)
-    FilledInPuzzle[orderednumlist[:-1,3],orderednumlist[:-1,1],orderednumlist[:-1,2]] = orderednumlist[:-1,3]+1
-    print(FilledInPuzzle[orderednumlist[:-1,3]])
+    for p,fpuzzle in enumerate(FilledInPuzzle):
+                FilledInPuzzle[p,orderednumlist[-1][1],orderednumlist[-1][2]] = -1
+    FilledInPuzzle[orderednumlist[-1][3],orderednumlist[-1][1],orderednumlist[-1][2]] = orderednumlist[-1][3]+1
+    print(orderednumlist[-10:])
+    print("puzzle: " + str(orderednumlist[-1][3]+1) + " x-coord: " + str(orderednumlist[-1][1]) + " y-coord: " + str(orderednumlist[-1][2]))
+    return FilledInPuzzle
+ 
+def IteratePuzzle(puzzle,iter):
+    IteratedPuzzle = puzzle
+    for i in range(iter):
+        IteratedPuzzle = FillInNumber(PercentPuzzle(SanitizePuzzle(IteratedPuzzle)))
+    return IteratedPuzzle
 
-                    
+def ConcatPuzzle(puzzle):
+    newpuzzle = []
+    for p,cpuzzle in puzzle:
+        for x,line in cpuzzle:
+            for y,num in cpuzzle:
+                print('deez')
+                
 
-
-puzzlepercent = PercentPuzzle(SanitizePuzzle(puzzle))
-FillInNumber(puzzlepercent)
-for i in range(len(puzzlepercent)):
+initedpuzzle = InitPuzzle(puzzle)
+finishedpuzzle = IteratePuzzle(initedpuzzle,25)
+for i in range(len(finishedpuzzle)):
     plt.figure(i+1)
-    sns.heatmap(data=puzzlepercent[i],vmax = 0.5,vmin=-0.1,annot=True)
+    sns.heatmap(data=finishedpuzzle[i],vmax = 0.5,vmin=-0.1,annot=True)
 plt.show()
