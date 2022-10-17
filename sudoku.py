@@ -10,7 +10,7 @@ plt.style.use("seaborn")
 
 puzzlereader = []
 
-with open('puzzle.csv', mode='r') as file:
+with open('easypuzzle.csv', mode='r') as file:
     csvFile = csv.reader(file)
     for lines in csvFile:
         puzzlereader.append(lines)
@@ -116,8 +116,10 @@ def ConcatPuzzle(puzzle):
                 
 
 initedpuzzle = InitPuzzle(puzzle)
-finishedpuzzle = IteratePuzzle(initedpuzzle,25)
+finishedpuzzle = IteratePuzzle(initedpuzzle,55)
 for i in range(len(finishedpuzzle)):
+    plt.gca().set_aspect('equal')
     plt.figure(i+1)
-    sns.heatmap(data=finishedpuzzle[i],vmax = 0.5,vmin=-0.1,annot=True)
+    sns.heatmap(data=finishedpuzzle[i],vmax = 0.5,vmin=-0.1,annot=True,cbar=False)
+    plt.gca().set_aspect('equal')
 plt.show()
